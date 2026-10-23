@@ -4,7 +4,12 @@ import android.text.format.DateFormat
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -13,17 +18,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
 import androidx.compose.ui.unit.sp
+import com.apprelogio.R
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 /**
  * Tela do relógio. Com [fullScreen] (paisagem) usa fundo preto e
- * dimensiona os dígitos para ocupar a largura da tela.
+ * dimensiona os dígitos para ocupar a largura da tela. Em paisagem também
+ * mostra um ícone no canto enquanto o aparelho está carregando.
  */
 @Composable
 fun ClockScreen(fullScreen: Boolean, modifier: Modifier = Modifier) {
@@ -60,5 +70,30 @@ fun ClockScreen(fullScreen: Boolean, modifier: Modifier = Modifier) {
                 fontSize = if (fullScreen) 20.sp else 18.sp,
             )
         }
+
+        if (fullScreen) {
+            ChargingIndicator(
+                color = foreground.copy(alpha = 0.6f),
+                modifier = Modifier.align(Alignment.TopEnd).padding(24.dp),
+            )
+        }
+    }
+}
+
+/** Raio e porcentagem da bateria; só aparece enquanto estiver carregando. */
+@Composable
+private fun ChargingIndicator(color: Color, modifier: Modifier = Modifier) {
+    val battery = rememberBatteryStatus()
+    if (!battery.charging) return
+
+    Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
+        Icon(
+            painter = painterResource(R.drawable.ic_battery_charging),
+            contentDescription = stringResource(R.string.charging),
+            tint = color,
+            modifier = Modifier.size(24.dp),
+        )
+        Spacer(Modifier.width(4.dp))
+        Text(text = "${battery.percent}%", color = color, fontSize = 18.sp)
     }
 }

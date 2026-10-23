@@ -2,5 +2,6 @@
     <string name="app_name">Relógio</string>
     <string name="mode_clock">Relógio</string>
     <string name="mode_pomodoro">Pomodoro</string>
+    <string name="charging">Carregando</string>
     <string name="pomodoro_coming_soon">Modo Pomodoro em breve</string>
 </resources>
