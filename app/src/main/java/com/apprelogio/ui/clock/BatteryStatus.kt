@@ -14,7 +14,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
 
-/** Estado da bateria: se está carregando e a carga em porcentagem. */
+/** Estado da bateria: se o carregador está conectado e a carga em porcentagem. */
 data class BatteryStatus(val charging: Boolean, val percent: Int)
 
 /** Estado da bateria, atualizado sempre que o sistema avisa uma mudança. */
@@ -41,12 +41,13 @@ fun rememberBatteryStatus(): BatteryStatus {
 }
 
 private fun Intent.toBatteryStatus(): BatteryStatus {
-    val state = getIntExtra(BatteryManager.EXTRA_STATUS, -1)
+    // Usa "cabo conectado" em vez do status de carga: muitos aparelhos pausam
+    // a carga (proteção da bateria, carga adaptativa) mesmo com o cabo ligado.
+    val plugged = getIntExtra(BatteryManager.EXTRA_PLUGGED, 0)
     val level = getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
     val scale = getIntExtra(BatteryManager.EXTRA_SCALE, 100)
     return BatteryStatus(
-        charging = state == BatteryManager.BATTERY_STATUS_CHARGING ||
-            state == BatteryManager.BATTERY_STATUS_FULL,
+        charging = plugged != 0,
         percent = if (level >= 0 && scale > 0) level * 100 / scale else 0,
     )
 }

@@ -11,7 +11,9 @@ App Android de relógio que entra em **tela cheia** quando o celular é girado p
 ## O que já faz
 
 - Relógio com horas, segundos e data, atualizado a cada segundo (segue o formato 12/24h do aparelho).
+- Números em fonte de 7 segmentos, estilo relógio digital de mesa ([DSEG7](https://github.com/keshikan/DSEG), licença OFL em `licenses/`).
 - Em paisagem: fundo preto, dígitos grandes, barras do sistema escondidas e tela sempre ligada.
+- Em paisagem: ícone de carregamento com a porcentagem da bateria enquanto o carregador estiver conectado.
 - Em retrato: barra inferior para trocar entre **Relógio** e **Pomodoro** (Pomodoro ainda é só um espaço reservado).
 
 ## Estrutura

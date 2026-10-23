@@ -2,6 +2,7 @@ package com.apprelogio.ui.clock
 
 import android.text.format.DateFormat
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -21,14 +22,19 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
 import androidx.compose.ui.unit.sp
 import com.apprelogio.R
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+
+/** Fonte de display de 7 segmentos (DSEG7, licença OFL), como relógio de mesa. */
+private val SevenSegment = FontFamily(Font(R.font.dseg7_classic_regular))
 
 /**
  * Tela do relógio. Com [fullScreen] (paisagem) usa fundo preto e
@@ -52,18 +58,15 @@ fun ClockScreen(fullScreen: Boolean, modifier: Modifier = Modifier) {
         contentAlignment = Alignment.Center,
     ) {
         // Dígitos proporcionais à tela, limitados pela altura para não cortar.
-        val timeSize: Dp = if (fullScreen) min(maxWidth * 0.30f, maxHeight * 0.55f) else maxWidth * 0.22f
+        // "88:88" na fonte de 7 segmentos ocupa cerca de 3,5x o tamanho da fonte.
+        val timeSize: Dp = if (fullScreen) min(maxWidth * 0.26f, maxHeight * 0.5f) else maxWidth * 0.22f
         val timeSp = with(LocalDensity.current) { timeSize.toSp() }
-        val digits = TextStyle(fontFeatureSettings = "tnum", fontWeight = FontWeight.Light)
 
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(text = time, color = foreground, fontSize = timeSp, style = digits, maxLines = 1)
-            Text(
-                text = seconds,
-                color = foreground.copy(alpha = 0.6f),
-                fontSize = timeSp * 0.25f,
-                style = digits,
-            )
+            SegmentText(text = time, color = foreground, fontSize = timeSp)
+            Spacer(Modifier.size(timeSize * 0.12f))
+            SegmentText(text = seconds, color = foreground.copy(alpha = 0.6f), fontSize = timeSp * 0.25f)
+            Spacer(Modifier.size(timeSize * 0.08f))
             Text(
                 text = date.replaceFirstChar { it.titlecase(locale) },
                 color = foreground.copy(alpha = 0.6f),
@@ -80,7 +83,25 @@ fun ClockScreen(fullScreen: Boolean, modifier: Modifier = Modifier) {
     }
 }
 
-/** Raio e porcentagem da bateria; só aparece enquanto estiver carregando. */
+/**
+ * Texto na fonte de 7 segmentos, com os segmentos apagados ("88:88") bem
+ * fracos por trás, como num visor de relógio de mesa.
+ */
+@Composable
+private fun SegmentText(text: String, color: Color, fontSize: TextUnit) {
+    val style = TextStyle(fontFamily = SevenSegment, fontSize = fontSize)
+    Box {
+        Text(
+            text = text.map { if (it.isDigit()) '8' else it }.joinToString(""),
+            color = color.copy(alpha = color.alpha * 0.08f),
+            style = style,
+            maxLines = 1,
+        )
+        Text(text = text, color = color, style = style, maxLines = 1)
+    }
+}
+
+/** Raio e porcentagem da bateria; aparece enquanto o carregador estiver conectado. */
 @Composable
 private fun ChargingIndicator(color: Color, modifier: Modifier = Modifier) {
     val battery = rememberBatteryStatus()
